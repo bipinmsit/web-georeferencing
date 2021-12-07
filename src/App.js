@@ -7,9 +7,12 @@ import Layers from "./Layers/Layers";
 function App() {
   // return <Mapbox zoom={5} center={[80, 20]}></Mapbox>;
   return (
-    <Openlayers zoom={7} center={[80, 20]}>
-      <Layers />
-    </Openlayers>
+    <>
+      {/* <Mapbox zoom={7} center={[80, 20]} /> */}
+      <Openlayers zoom={7} center={[80, 20]}>
+        <Layers />
+      </Openlayers>
+    </>
   );
 }
 

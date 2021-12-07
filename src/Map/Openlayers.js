@@ -14,7 +14,14 @@ export const Openlayers = ({ children, zoom, center }) => {
   useEffect(() => {
     let options = {
       view: new ol.View({ zoom, center, projection: "EPSG:4326" }),
-      layers: [new TileLayer({ source: new OSM() })],
+      // layers: [],
+      layers: [
+        new TileLayer({
+          title: "OSM",
+          visible: true,
+          source: new OSM({}),
+        }),
+      ],
       controls: [],
       overlays: [],
     };

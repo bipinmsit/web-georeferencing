@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import GeoJSON from "ol/format/GeoJSON";
@@ -9,8 +9,12 @@ import { Modify, Select, Snap } from "ol/interaction";
 import Text from "ol/style/Text";
 import Point from "ol/geom/Point";
 import Route from "../data/Route.geojson";
+import RoutePoints from "../data/RoutePoints.geojson";
 import NewATS from "../data/NewATS.geojson";
 import NewWayPoint from "../data/NewWayPoint.geojson";
+import LayerSwitcher from "ol-layerswitcher";
+import { Group as LayerGroup } from "ol/layer";
+import "ol-layerswitcher/dist/ol-layerswitcher.css";
 
 const Layers = () => {
   const { map } = useContext(MapContextOpenlayers);
@@ -18,26 +22,13 @@ const Layers = () => {
   const styles_point = new Style({
     image: new Circle({
       fill: new Fill({
-        color: "blue",
+        color: "yellow",
       }),
       stroke: new Stroke({
-        color: "#3399CC",
+        color: "black",
         width: 1.25,
       }),
-      radius: 4,
-    }),
-    fill: new Fill({
-      color: "rgba(255,255,255,0.4)",
-    }),
-    stroke: new Stroke({
-      color: "red",
-      width: 2,
-    }),
-    text: new Text({
-      font: 'bold 7px "Open Sans""',
-      placement: "point",
-      fill: new Fill({ color: "red" }),
-      stroke: new Stroke({ color: "magenta", width: 0.7 }),
+      radius: 1.5,
     }),
   });
 
@@ -74,7 +65,7 @@ const Layers = () => {
               color: "#3399CC",
               width: 1.25,
             }),
-            radius: 4,
+            radius: 2,
           }),
         })
       );
@@ -83,63 +74,126 @@ const Layers = () => {
     return styles;
   };
 
-  const styleFunction = (feature) => {
+  const wayPointLabelStyle = (feature) => {
+    const styles_point = new Style({
+      image: new Circle({
+        fill: new Fill({
+          color: "blue",
+        }),
+        stroke: new Stroke({
+          color: "#3399CC",
+          width: 1.25,
+        }),
+        radius: 0,
+      }),
+      text: new Text({
+        font: '7px "Open Sans""',
+        scale: 0.75,
+        offsetY: 10,
+        fill: new Fill({ color: "black" }),
+        stroke: new Stroke({ color: "black", width: 0.3 }),
+      }),
+    });
     styles_point.getText().setText(feature.get("PNAME"));
     return styles_point;
   };
 
-  const [overlayLayers1, setOverlayLayers1] = useState(
-    new VectorLayer({
-      zIndex: 1000,
-      source: new VectorSource({
-        // url: "http://localhost:8080/Route.geojson",
-        url: Route,
-        format: new GeoJSON(),
-        wrapX: false,
-      }),
-      style: vertexPolylineStyle,
-    })
-  );
+  const route = new VectorLayer({
+    title: "Route",
+    zIndex: 1000,
+    source: new VectorSource({
+      // url: "http://localhost:8080/Route.geojson",
+      url: Route,
+      format: new GeoJSON(),
+      wrapX: false,
+    }),
+    style: vertexPolylineStyle,
+  });
 
-  const [overlayLayers2, setOverlayLayers2] = useState(
-    new VectorLayer({
-      source: new VectorSource({
-        // url: "http://localhost:8080/NewATS.geojson",
-        url: NewATS,
-        format: new GeoJSON(),
-      }),
-      style: styles_grey,
-    })
-  );
+  const routePoints = new VectorLayer({
+    title: "Route Points",
+    zIndex: 1000,
+    source: new VectorSource({
+      // url: "http://localhost:8080/Route.geojson",
+      url: RoutePoints,
+      format: new GeoJSON(),
+      wrapX: false,
+    }),
+    style: (feature) => {
+      const styles_point = new Style({
+        image: new Circle({
+          fill: new Fill({
+            color: "blue",
+          }),
+          stroke: new Stroke({
+            color: "#3399CC",
+            width: 1.25,
+          }),
+          radius: 3,
+        }),
+        text: new Text({
+          font: '7px "Open Sans""',
+          offsetX: -30,
+          scale: 0.75,
+          fill: new Fill({ color: "blue" }),
+          stroke: new Stroke({ color: "blue", width: 0.3 }),
+        }),
+      });
+      styles_point.getText().setText(feature.get("PointFromName"));
+      return styles_point;
+    },
+  });
 
-  const [overlayLayers3, setOverlayLayers3] = useState(
-    new VectorLayer({
-      source: new VectorSource({
-        // url: "http://localhost:8080/NewWayPoint.geojson",
-        url: NewWayPoint,
-        format: new GeoJSON(),
-      }),
-      style: styleFunction,
-    })
-  );
+  const newAts = new VectorLayer({
+    title: "ATS",
+    visible: true,
+    source: new VectorSource({
+      // url: "http://localhost:8080/NewATS.geojson",
+      url: NewATS,
+      format: new GeoJSON(),
+    }),
+    style: styles_grey,
+  });
+
+  const newWayPoint = new VectorLayer({
+    title: "Way Point",
+    visible: true,
+    source: new VectorSource({
+      // url: "http://localhost:8080/NewWayPoint.geojson",
+      url: NewWayPoint,
+      format: new GeoJSON(),
+    }),
+    style: styles_point,
+  });
+
+  const newWayPointLabel = new VectorLayer({
+    title: "Way Point Label",
+    visible: false,
+    source: new VectorSource({
+      // url: "http://localhost:8080/NewWayPoint.geojson",
+      url: NewWayPoint,
+      format: new GeoJSON(),
+    }),
+    style: wayPointLabelStyle,
+  });
+
+  const layerGroup = new LayerGroup({
+    title: "LAYERS",
+    visible: true,
+    layers: [routePoints, route, newAts, newWayPoint, newWayPointLabel],
+  });
 
   useEffect(() => {
     if (!map) {
       return;
     }
 
-    map.addLayer(overlayLayers2);
-    map.addLayer(overlayLayers3);
-    map.addLayer(overlayLayers1);
+    map.addLayer(layerGroup);
 
     return () => {
-      map.removeLayer(overlayLayers1);
-      map.removeLayer(overlayLayers2);
-      map.removeLayer(overlayLayers3);
+      map.removeLayer(layerGroup);
     };
-
-    // map.getLayers.extend([overlayLayers1, overlayLayers2, overlayLayers3]);
-  }, [map, overlayLayers1, overlayLayers2, overlayLayers3]);
+  }, [map, layerGroup]);
 
   useEffect(() => {
     if (!map) {
@@ -153,7 +207,7 @@ const Layers = () => {
     // map.addInteraction(select);
     const modify = new Modify({
       // features: select.getFeatures(),
-      source: overlayLayers1.getSource(),
+      source: route.getSource(),
       snapToPointer: true,
       insertVertexCondition: () => {
         return false;
@@ -175,7 +229,7 @@ const Layers = () => {
 
     map.addInteraction(modify);
 
-    const snap = new Snap({ source: overlayLayers3.getSource() });
+    const snap = new Snap({ source: newWayPoint.getSource() });
 
     map.addInteraction(snap);
 
@@ -184,7 +238,23 @@ const Layers = () => {
       // map.removeInteraction(select);
       map.removeInteraction(modify);
     };
-  }, [map, overlayLayers1, overlayLayers3]);
+  }, [map, newWayPoint, route]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+    const layerSwitcher = new LayerSwitcher({
+      // activationMode: "click",
+      startActive: false,
+      tipLabel: "Layers", // Optional label for button
+      groupSelectStyle: "children", // Can be 'children' [default], 'group' or 'none'
+      collapseTipLabel: "Collapse layers",
+    });
+    map.addControl(layerSwitcher);
+
+    return () => map.controls.remove(layerSwitcher);
+  }, [map]);
 
   return null;
 };

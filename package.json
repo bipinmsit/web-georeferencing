@@ -1,6 +1,6 @@
 {
   "name": "render-large-geojson",
-  "homepage": "http://bipinmsit.github.io/edit-route",
+  "homepage": "http://bipinmsit.github.io/mapboxGlJs",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

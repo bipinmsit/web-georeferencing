@@ -7,13 +7,10 @@ import { MapContextOpenlayers } from "../Map/Openlayers";
 import { Fill, Stroke, Circle, Style } from "ol/style";
 import { Modify, Select, Snap } from "ol/interaction";
 import Text from "ol/style/Text";
-import MultiPoint from "ol/geom/MultiPoint";
 import Point from "ol/geom/Point";
-import Events from "ol/events";
-import { Icon } from "ol/style";
-import LineString from "ol/geom/LineString";
-// import jsts from "jsts";
-// import { condition } from "ol/events";
+import Route from "../data/Route.geojson";
+import NewATS from "../data/NewATS.geojson";
+import NewWayPoint from "../data/NewWayPoint.geojson";
 
 const Layers = () => {
   const { map } = useContext(MapContextOpenlayers);
@@ -95,7 +92,8 @@ const Layers = () => {
     new VectorLayer({
       zIndex: 1000,
       source: new VectorSource({
-        url: "http://localhost:8080/Route.geojson",
+        // url: "http://localhost:8080/Route.geojson",
+        url: Route,
         format: new GeoJSON(),
         wrapX: false,
       }),
@@ -106,7 +104,8 @@ const Layers = () => {
   const [overlayLayers2, setOverlayLayers2] = useState(
     new VectorLayer({
       source: new VectorSource({
-        url: "http://localhost:8080/NewATS.geojson",
+        // url: "http://localhost:8080/NewATS.geojson",
+        url: NewATS,
         format: new GeoJSON(),
       }),
       style: styles_grey,
@@ -116,7 +115,8 @@ const Layers = () => {
   const [overlayLayers3, setOverlayLayers3] = useState(
     new VectorLayer({
       source: new VectorSource({
-        url: "http://localhost:8080/NewWayPoint.geojson",
+        // url: "http://localhost:8080/NewWayPoint.geojson",
+        url: NewWayPoint,
         format: new GeoJSON(),
       }),
       style: styleFunction,

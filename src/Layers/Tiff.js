@@ -30,11 +30,6 @@ const Tiff = () => {
   useEffect(() => {
     if (!map) return;
 
-    map.on("click", (e) => {
-      let { lng, lat } = e.lngLat;
-      console.log(lng, lat);
-    });
-
     map.on("load", () => {
       map.addSource("mytiff", {
         type: "image",
@@ -70,7 +65,7 @@ const Tiff = () => {
           }}
         />
         <button className="btn btn-primary" onClick={showModal}>
-          Upload non-georef
+          Upload non-georef / Edit
         </button>
         <Modal
           title="Georeferencer"

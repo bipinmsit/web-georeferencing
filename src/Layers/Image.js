@@ -1,13 +1,28 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
+import { MapContextMapbox } from "../Map/Mapbox";
 import mytif from "./../data/test3.png";
 import "./Image.css";
 
 const Image = ({ style }) => {
+  const { map } = useContext(MapContextMapbox);
   const imgId = useRef(null);
   const [imgDimension, setImgDimension] = useState({
     height: 400,
     width: 400,
   });
+
+  const [payload, setPayload] = useState([]);
+
+  console.log(payload);
+
+  useEffect(() => {
+    if (!map) return;
+    map.on("click", (e) => {
+      let { lng, lat } = e.lngLat;
+      console.log(lng, lat);
+      setPayload((prev) => [...prev, [lng, lat]]);
+    });
+  }, [map]);
 
   return (
     <>
@@ -32,7 +47,7 @@ const Image = ({ style }) => {
             let px = (x / cw) * iw;
             let py = (y / ch) * ih;
 
-            console.log(px, py);
+            setPayload((prev) => [...prev, [px, py]]);
           }}
           onWheel={(evt) => {
             const height = imgId.current.clientHeight;

@@ -14,6 +14,7 @@ function App() {
   return (
     <>
       <Mapbox zoom={16} center={[-87.494044, 36.860856]}>
+        {/* <Toggle /> */}
         <Tiff />
       </Mapbox>
     </>

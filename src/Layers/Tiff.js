@@ -6,8 +6,7 @@ import Image from "./Image";
 
 const Tiff = () => {
   const { map } = useContext(MapContextMapbox);
-  const [val, setVal] = useState(50);
-  const [payload, setPayload] = useState({});
+  const [val, setVal] = useState(100);
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
 

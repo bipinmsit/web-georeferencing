@@ -3,7 +3,7 @@ import { MapContextMapbox } from "../Map/Mapbox";
 import mytif from "./../data/test3.png";
 import "./Image.css";
 
-const Image = ({ style }) => {
+const Image = ({ data }) => {
   const { map } = useContext(MapContextMapbox);
   const imgId = useRef(null);
   const [imgDimension, setImgDimension] = useState({
@@ -22,6 +22,10 @@ const Image = ({ style }) => {
       console.log(lng, lat);
       setPayload((prev) => [...prev, [lng, lat]]);
     });
+
+    if (data) {
+      data(payload);
+    }
   }, [map]);
 
   return (
@@ -61,6 +65,7 @@ const Image = ({ style }) => {
           }}
         />
       </div>
+      
     </>
   );
 };
